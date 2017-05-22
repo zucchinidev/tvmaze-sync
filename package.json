@@ -38,7 +38,8 @@
   },
   "dependencies": {
     "client-request": "^2.0.0",
-    "tvmaze-zucchinidev": "0.0.4"
+    "mongodb": "^2.2.27",
+    "tvmaze-zucchinidev": "^0.0.5"
   },
   "nyc": {
     "sourceMap": false,
