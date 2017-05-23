@@ -1,5 +1,7 @@
 import { test } from 'babel-tap'
-import configuration from '../lib/configuration'
+import { Configuration } from '../lib/configuration'
+import { Constants } from '../lib/constants'
+const configuration = new Configuration(Constants.getConstants())
 
 test('should create a configuration instance', (t) => {
   t.ok(configuration, 'should exist')
