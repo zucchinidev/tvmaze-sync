@@ -1,4 +1,4 @@
-import { test, beforeEach } from 'babel-tap'
+import { test, beforeEach, afterEach } from 'babel-tap'
 import { Configuration } from '../lib/configuration'
 import { MongoClient } from '../lib/mongo-client'
 
@@ -13,7 +13,20 @@ let constants = {
 beforeEach((done) => {
   configuration = new Configuration(constants)
   mongo = new MongoClient(configuration.getConfig())
-  done()
+  const document = {
+    text: 'fake',
+    value: 'fake'
+  }
+  mongo.insert(document).then(() => {
+    done()
+  }).catch(err => console.log(err))
+})
+
+afterEach((done) => {
+  mongo.remove().then(() => {
+    mongo.close()
+    done()
+  }).catch(err => console.log(err))
 })
 
 test('should create a mongo client', (t) => {
@@ -33,7 +46,6 @@ test('should connect with mongodb server', (t) => {
   mongo.connecting().then((col) => {
     t.ok(col, 'should exist')
     t.equals(typeof col, 'object', 'should retrieve a collection object')
-    mongo.close()
     t.end()
   })
 })
@@ -54,7 +66,7 @@ test('should throw error in mongo connection', (t) => {
     })
 })
 
-test('should inserting one document', (t) => {
+test('should insert one document', (t) => {
   const document = {
     text: 'fake',
     value: 'fake'
@@ -67,7 +79,24 @@ test('should inserting one document', (t) => {
     t.equals(typeof col.insertedIds[0], 'object', 'should retrieve insertedIds')
     t.ok(col.insertedIds[0] instanceof mongo.ObjectID, 'should retrieve insertedIds')
     t.equals(col.insertedIds.length, 1, 'should retrieve one id')
-    mongo.close()
     t.end()
-  })
+  }).catch(err => console.log(err))
+})
+
+test('should delete one document', (t) => {
+  const document = {
+    text: 'fake',
+    value: 'fake'
+  }
+  mongo.insert(document).then((col) => {
+    const objectID = col.insertedIds[0]
+    mongo.deleteOne({
+      _id: objectID
+    }).then(response => {
+      t.ok(response, 'should exist')
+      t.equals(typeof response, 'object', 'should retrieve a response object')
+      t.equals(response.result.n, 1, 'should delete one document')
+      t.end()
+    }).catch(err => console.log(err))
+  }).catch(err => console.log(err))
 })
