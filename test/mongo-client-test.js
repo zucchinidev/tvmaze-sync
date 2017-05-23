@@ -1,9 +1,22 @@
-import { test, threw } from 'babel-tap'
-import configuration from '../lib/configuration'
+import { test, beforeEach } from 'babel-tap'
+import { Configuration } from '../lib/configuration'
 import { MongoClient } from '../lib/mongo-client'
 
+let mongo
+let configuration
+let constants = {
+  DB_CONNECTION_STRING: 'mongodb://localhost:27017',
+  DB_NAME: 'tvmaze_sync_test',
+  COLLECTION_NAME: 'test'
+}
+
+beforeEach((done) => {
+  configuration = new Configuration(constants)
+  mongo = new MongoClient(configuration.getConfig())
+  done()
+})
+
 test('should create a mongo client', (t) => {
-  const mongo = new MongoClient(configuration.getConfig())
   t.ok(MongoClient, 'should exist')
   t.equals(typeof mongo, 'object', 'should be an object')
   t.ok(mongo instanceof MongoClient, 'should be instance of SyncClient')
@@ -12,7 +25,6 @@ test('should create a mongo client', (t) => {
 
 test('should connect with mongodb server', (t) => {
   const config = configuration.getConfig()
-  const mongo = new MongoClient(config)
   const today = new Date()
   const timestamp = `${today.getFullYear()}${today.getMonth()}${today.getDate()}`
   const url = `${config.dbConnection}/${config.dbName}_${timestamp}`
@@ -24,4 +36,38 @@ test('should connect with mongodb server', (t) => {
     mongo.close()
     t.end()
   })
-}).catch(threw)
+})
+
+test('should throw error in mongo connection', (t) => {
+  const configuration = new Configuration({
+    dbConnection: 'fake',
+    dbName: 'fake',
+    collectionName: 'fake'
+  })
+  const config = configuration.getConfig()
+  const mongo = new MongoClient(config)
+  mongo.connecting()
+    .then(Function.prototype)
+    .catch((err) => {
+      t.ok(err, 'should exist')
+      t.end()
+    })
+})
+
+test('should inserting one document', (t) => {
+  const document = {
+    text: 'fake',
+    value: 'fake'
+  }
+  mongo.insert(document).then((col) => {
+    t.ok(col, 'should exist')
+    t.equals(typeof col, 'object', 'should retrieve a response object')
+    t.equals(col.insertedCount, 1, 'should create one document')
+    t.ok(Array.isArray(col.insertedIds), 'should retrieve an array of insertedIds')
+    t.equals(typeof col.insertedIds[0], 'object', 'should retrieve insertedIds')
+    t.ok(col.insertedIds[0] instanceof mongo.ObjectID, 'should retrieve insertedIds')
+    t.equals(col.insertedIds.length, 1, 'should retrieve one id')
+    mongo.close()
+    t.end()
+  })
+})
