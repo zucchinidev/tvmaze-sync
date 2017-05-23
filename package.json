@@ -12,7 +12,7 @@
     "clean": "rm -rf dist",
     "build": "npm run clean && babel lib -s -d dist",
     "production": "node bin/production",
-    "coverage": "istanbul cover babel-tap -- test/*-test.js && npm run html-report"
+    "coverage": "NODE_ENV=test istanbul cover babel-tap -- test/*-test.js && npm run html-report"
   },
   "keywords": [
     "tvmaze",
