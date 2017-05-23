@@ -19,14 +19,14 @@ beforeEach((done) => {
   }
   mongo.insert(document).then(() => {
     done()
-  }).catch(err => console.log(err))
+  }).catch(console.log.bind(console))
 })
 
 afterEach((done) => {
   mongo.remove().then(() => {
     mongo.close()
     done()
-  }).catch(err => console.log(err))
+  }).catch(console.log.bind(console))
 })
 
 test('should create a mongo client', (t) => {
@@ -80,7 +80,7 @@ test('should insert one document', (t) => {
     t.ok(col.insertedIds[0] instanceof mongo.ObjectID, 'should retrieve insertedIds')
     t.equals(col.insertedIds.length, 1, 'should retrieve one id')
     t.end()
-  }).catch(err => console.log(err))
+  }).catch(console.log.bind(console))
 })
 
 test('should delete one document', (t) => {
@@ -97,6 +97,37 @@ test('should delete one document', (t) => {
       t.equals(typeof response, 'object', 'should retrieve a response object')
       t.equals(response.result.n, 1, 'should delete one document')
       t.end()
-    }).catch(err => console.log(err))
-  }).catch(err => console.log(err))
+    }).catch(console.log.bind(console))
+  }).catch(console.log.bind(console))
+})
+
+test('should delete all documents', (t) => {
+  mongo.remove().then(response => {
+    t.ok(response, 'should exist')
+    t.equals(response.result.n, 1, 'should delete two documents')
+    mongo.find({}).then(r => {
+      t.ok(r, 'should exist')
+      t.equals(typeof r, 'object', 'should retrieve a response object')
+      t.ok(Array.isArray(r), 'should retrieve an array')
+      t.equals(r.length, 0, 'should be empty array')
+      t.end()
+    })
+  }).catch(console.log.bind(console))
+})
+
+test('should update a document', (t) => {
+  mongo.find({}).then(r => {
+    t.ok(r, 'should exist')
+    t.equals(typeof r, 'object', 'should retrieve a response object')
+    t.ok(Array.isArray(r), 'should retrieve an array')
+    t.equals(r.length, 1, 'should has one element')
+    const documentFound = r[0]
+    mongo.update({_id: documentFound._id}, {fake: 'modify'})
+      .then(response => {
+        t.ok(response, 'should exist')
+        t.equals(typeof response, 'object', 'should retrieve a response object')
+        t.equals(response.result.n, 1, 'should update one document')
+        t.end()
+      })
+  }).catch(console.log.bind(console))
 })
