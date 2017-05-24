@@ -23,7 +23,7 @@ beforeEach((done) => {
 })
 
 afterEach((done) => {
-  mongo.remove().then(() => {
+  mongo.deleteMany({}).then(() => {
     mongo.close()
     done()
   }).catch(console.log.bind(console))
@@ -102,7 +102,7 @@ test('should delete one document', (t) => {
 })
 
 test('should delete all documents', (t) => {
-  mongo.remove().then(response => {
+  mongo.deleteMany({}).then(response => {
     t.ok(response, 'should exist')
     t.equals(response.result.n, 1, 'should delete two documents')
     mongo.find({}).then(r => {
