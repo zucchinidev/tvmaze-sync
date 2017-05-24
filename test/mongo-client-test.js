@@ -17,9 +17,9 @@ beforeEach((done) => {
     text: 'fake',
     value: 'fake'
   }
-  mongo.insert(document).then(() => {
-    done()
-  }).catch(console.log.bind(console))
+  mongo.insert(document)
+    .then(() => done())
+    .catch(console.log.bind(console))
 })
 
 afterEach((done) => {
