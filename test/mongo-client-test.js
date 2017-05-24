@@ -83,6 +83,26 @@ test('should insert one document', (t) => {
   }).catch(console.log.bind(console))
 })
 
+test('should insert many documents', (t) => {
+  const documents = [
+    {
+      text: 'fake',
+      value: 'fake'
+    },
+    {
+      text: 'fake',
+      value: 'fake'
+    }
+  ]
+  mongo.insertMany(documents).then((reponse) => {
+    t.ok(reponse, 'should exist')
+    t.equals(typeof reponse, 'object', 'should retrieve a response object')
+    t.equals(reponse.insertedCount, 2, 'should create one documents')
+    t.equals(reponse.insertedIds.length, 2, 'should retrieve one id')
+    t.end()
+  }).catch(console.log.bind(console))
+})
+
 test('should delete one document', (t) => {
   const document = {
     text: 'fake',
