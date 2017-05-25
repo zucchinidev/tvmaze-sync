@@ -94,11 +94,11 @@ test('should insert many documents', (t) => {
       value: 'fake'
     }
   ]
-  mongo.insertMany(documents).then((reponse) => {
-    t.ok(reponse, 'should exist')
-    t.equals(typeof reponse, 'object', 'should retrieve a response object')
-    t.equals(reponse.insertedCount, 2, 'should create one documents')
-    t.equals(reponse.insertedIds.length, 2, 'should retrieve one id')
+  mongo.insertMany(documents).then((response) => {
+    t.ok(response, 'should exist')
+    t.equals(typeof response, 'object', 'should retrieve a response object')
+    t.equals(response.insertedCount, 2, 'should create one documents')
+    t.equals(response.insertedIds.length, 2, 'should retrieve one id')
     t.end()
   }).catch(console.log.bind(console))
 })
