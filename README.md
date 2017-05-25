@@ -1,6 +1,6 @@
 # tvmaze-sync
 
-A ES2015 Module to synchronize the TVMaze api with your local resource
+A Module to synchronize the TVMaze api with your local resource
 
 ## Install
 
@@ -10,12 +10,23 @@ $ npm install tvmaze-sync --save
 ## Usage
 ```js
 
-import { tvmazeSync } from 'tvmaze-sync'
-const client = tvmaze.createClient()
+import { sync } from './lib'
 
-tvmazeSync.sync().then((response) => {
-    // do something with shows
-})
+const constants = {
+  mongo: {
+    dbConnection: 'mongodb://localhost:27017',
+    dbName: 'tvmaze_sync_test',
+    collectionName: 'sync'
+  },
+  request: {
+    maxNumberOfPages: 100, // default value 100
+    initialPage: 0 // default value 0
+  }
+}
+
+const syncClient = sync.createClient(constants)
+syncClient.sync()
+
 
 ```
 
