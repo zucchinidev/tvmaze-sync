@@ -21,7 +21,7 @@ test('should create a sync client', (t) => {
   t.equals(typeof sync, 'object', 'should be an object')
   t.ok(syncClient instanceof SyncClient, 'should be instance of SyncClient')
   t.ok(syncClient.configuration instanceof Configuration, 'should be instance of SyncClient')
-  t.equals(typeof syncClient.client, 'object', 'should be an object')
+  t.equals(typeof syncClient.tvmazeClient, 'object', 'should be an object')
   t.end()
 })
 
