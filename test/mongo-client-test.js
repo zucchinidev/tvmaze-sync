@@ -4,15 +4,17 @@ import { MongoClient } from '../lib/mongo-client'
 
 let mongo
 let configuration
-let constants = {
-  DB_CONNECTION_STRING: 'mongodb://localhost:27017',
-  DB_NAME: 'tvmaze_sync_test',
-  COLLECTION_NAME: 'test'
+const constants = {
+  mongo: {
+    dbConnection: 'mongodb://localhost:27017',
+    dbName: 'tvmaze_sync_test',
+    collectionName: 'sync'
+  }
 }
 
 beforeEach((done) => {
   configuration = new Configuration(constants)
-  mongo = new MongoClient(configuration.getConfig())
+  mongo = new MongoClient(configuration.getConfig().mongo)
   const document = {
     text: 'fake',
     value: 'fake'
@@ -37,7 +39,7 @@ test('should create a mongo client', (t) => {
 })
 
 test('should connect with mongodb server', (t) => {
-  const config = configuration.getConfig()
+  const config = configuration.getConfig().mongo
   const today = new Date()
   const timestamp = `${today.getFullYear()}${today.getMonth()}${today.getDate()}`
   const url = `${config.dbConnection}/${config.dbName}_${timestamp}`
@@ -52,12 +54,13 @@ test('should connect with mongodb server', (t) => {
 
 test('should throw error in mongo connection', (t) => {
   const configuration = new Configuration({
-    dbConnection: 'fake',
-    dbName: 'fake',
-    collectionName: 'fake'
+    mongo: {
+      dbConnection: 'fake',
+      dbName: 'fake',
+      collectionName: 'fake'
+    }
   })
-  const config = configuration.getConfig()
-  const mongo = new MongoClient(config)
+  const mongo = new MongoClient(configuration.getConfig().mongo)
   mongo.connecting()
     .then(Function.prototype)
     .catch((err) => {
@@ -142,7 +145,7 @@ test('should update a document', (t) => {
     t.ok(Array.isArray(r), 'should retrieve an array')
     t.equals(r.length, 1, 'should has one element')
     const documentFound = r[0]
-    mongo.update({_id: documentFound._id}, {fake: 'modify'})
+    mongo.update({ _id: documentFound._id }, { fake: 'modify' })
       .then(response => {
         t.ok(response, 'should exist')
         t.equals(typeof response, 'object', 'should retrieve a response object')
