@@ -3,6 +3,8 @@ import { sync } from '../lib'
 import { SyncClient } from '../lib/sync-client'
 import { Configuration } from '../lib/configuration'
 const sinon = require('sinon')
+const sinonStubPromise = require('sinon-stub-promise')
+sinonStubPromise(sinon)
 
 const constants = {
   mongo: {
@@ -52,15 +54,62 @@ test('should get second interval', (t) => {
 })
 
 test('should perform the synchronization', (t) => {
-  const spy = sinon.spy(syncClient, 'getPage')
+  sinon.stub(syncClient, 'getPage')
   let clock = sinon.useFakeTimers()
   t.ok(syncClient.sync, 'should exist')
   t.equals(typeof syncClient.sync, 'function', 'should be a function')
   syncClient.sync()
-  t.equals(spy.callCount, 0, 'should be equal 0')
+  t.equals(syncClient.getPage.callCount, 0, 'should be equal 0')
   clock.tick(SyncClient.getSecondsInterval())
-  t.equals(spy.callCount, 1, 'should be equal 1')
+  t.equals(syncClient.getPage.callCount, 1, 'should be equal 1')
   clock.restore()
   syncClient.getPage.restore()
+  t.end()
+})
+
+test('should insert one page in mongodb', (t) => {
+  const getPage = sinon.stub(syncClient.tvmazeClient, 'getPage').returns(Promise.resolve({
+    body: { id: 'fake' }
+  }))
+  const insertPageStub = sinon.stub(syncClient, 'insertPage')
+  syncClient.getPage(0)
+  getPage().then(() => {
+    t.equals(insertPageStub.callCount, 1, 'should insert a page')
+    syncClient.tvmazeClient.getPage.restore()
+    syncClient.insertPage.restore()
+    t.end()
+  })
+})
+
+test('maximum number of pages reached', (t) => {
+  sinon.stub(syncClient.tvmazeClient, 'getPage').returnsPromise().resolves({})
+  syncClient.recoveredPages = 100
+  const timer = 2822
+  syncClient.getPage(101, timer)
+  syncClient.tvmazeClient.getPage.restore()
+  syncClient.recoveredPages = 0
+  t.end()
+})
+
+test('page not found', (t) => {
+  const consoleStub = sinon.stub(console, 'log')
+  sinon.stub(syncClient.tvmazeClient, 'getPage').returnsPromise().rejects({message: 'Status code 404'})
+  const timer = 2822
+  syncClient.getPage(180, timer)
+  t.equals(consoleStub.callCount, 4, 'should show log message')
+  syncClient.tvmazeClient.getPage.restore()
+  console.log.restore()
+  t.end()
+})
+
+test('too many request, Three attempts made', (t) => {
+  const consoleStub = sinon.stub(console, 'log')
+  syncClient.retries = 3
+  sinon.stub(syncClient.tvmazeClient, 'getPage').returnsPromise().rejects({message: 'Status code 429'})
+  const timer = 2822
+  syncClient.getPage(20, timer)
+  t.equals(consoleStub.callCount, 3, 'should show log message')
+  syncClient.tvmazeClient.getPage.restore()
+  console.log.restore()
   t.end()
 })
