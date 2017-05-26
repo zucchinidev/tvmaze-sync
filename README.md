@@ -10,7 +10,9 @@ $ npm install tvmaze-sync --save
 ## Usage
 ```js
 
-import { sync } from './lib'
+import { sync } from 'tvmaze-sync'
+// or
+const sync = require('tvmaze-sync').sync
 
 const constants = {
   mongo: {
