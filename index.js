@@ -7,7 +7,7 @@ const constants = {
     collectionName: 'sync'
   },
   request: {
-    maxNumberOfPages: 100,
+    maxNumberOfPages: 200,
     initialPage: 0
   }
 }
