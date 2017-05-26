@@ -2,7 +2,7 @@
   "name": "tvmaze-sync",
   "version": "0.1.0",
   "description": "Module to synchronize the tvmaze api with your local resource",
-  "main": "lib/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "lint": "standard",
     "test-coverage": "NODE_ENV=test ./node_modules/nyc/bin/nyc.js npm test",
