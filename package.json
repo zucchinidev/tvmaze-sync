@@ -1,6 +1,6 @@
 {
   "name": "tvmaze-sync",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Module to synchronize the tvmaze api with your local resource",
   "main": "lib/index.js",
   "scripts": {
