@@ -1,14 +1,16 @@
 import { test, beforeEach } from 'babel-tap'
 import { sync } from '../lib'
-import { SyncClient } from '../lib/SyncClient'
+import { SyncClient } from '../lib/sync-client'
 import { Configuration } from '../lib/configuration'
+const sinon = require('sinon')
 
 const constants = {
-  DB_CONNECTION_STRING: 'mongodb://localhost:27017',
-  DB_NAME: 'tvmaze_sync_test',
-  COLLECTION_NAME: 'sync'
+  mongo: {
+    dbConnection: 'mongodb://localhost:27017',
+    dbName: 'tvmaze_sync_test',
+    collectionName: 'sync'
+  }
 }
-
 const configuration = new Configuration(constants)
 let syncClient
 beforeEach((done) => {
@@ -20,8 +22,9 @@ test('should create a sync client', (t) => {
   t.ok(sync, 'should exist')
   t.equals(typeof sync, 'object', 'should be an object')
   t.ok(syncClient instanceof SyncClient, 'should be instance of SyncClient')
-  t.ok(syncClient.configuration instanceof Configuration, 'should be instance of SyncClient')
-  t.equals(typeof syncClient.tvmazeClient, 'object', 'should be an object')
+  t.ok(syncClient.tvmazeClient instanceof Object, 'should be instance of SyncClient')
+  t.ok(syncClient.mongoClient instanceof Object, 'should be instance of SyncClient')
+  t.ok(syncClient.requestConfiguration instanceof Object, 'should be instance of SyncClient')
   t.end()
 })
 
@@ -44,13 +47,20 @@ test('should get successive number pages', (t) => {
 })
 
 test('should get second interval', (t) => {
-  t.equals(syncClient.getSecondsInterval(), 1000, 'should be one second')
+  t.equals(SyncClient.getSecondsInterval(), 1000, 'should be one second')
   t.end()
 })
 
 test('should perform the synchronization', (t) => {
+  const spy = sinon.spy(syncClient, 'getPage')
+  let clock = sinon.useFakeTimers()
   t.ok(syncClient.sync, 'should exist')
   t.equals(typeof syncClient.sync, 'function', 'should be a function')
-  syncClient.sync(0)
+  syncClient.sync()
+  t.equals(spy.callCount, 0, 'should be equal 0')
+  clock.tick(SyncClient.getSecondsInterval())
+  t.equals(spy.callCount, 1, 'should be equal 1')
+  clock.restore()
+  syncClient.getPage.restore()
   t.end()
 })
