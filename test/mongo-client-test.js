@@ -154,3 +154,12 @@ test('should update a document', (t) => {
       })
   }).catch(console.log.bind(console))
 })
+
+test('should count documents', (t) => {
+  mongo.count({}).then(r => {
+    t.ok(r, 'should exist')
+    t.equals(typeof r, 'number', 'should retrieve a number')
+    t.equals(r, 1, 'should retrieve one document')
+    t.end()
+  }).catch(console.log.bind(console))
+})
