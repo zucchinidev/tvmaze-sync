@@ -1,6 +1,6 @@
 # tvmaze-sync
 
-A Module to synchronize the TVMaze api with your local resource
+A module to synchronize the TVMaze api with your local mongo database
 
 ## Install
 
@@ -19,7 +19,7 @@ const constants = {
     collectionName: 'sync'
   },
   request: {
-    maxNumberOfPages: 100, // default value 100
+    maxNumberOfPages: 200, // default value 100
     initialPage: 0 // default value 0
   }
 }
@@ -27,6 +27,17 @@ const constants = {
 const syncClient = sync.createClient(constants)
 syncClient.sync()
 
+// output
+Inserted page 0 with 240 documents
+Next interval page  1
+...
+...
+...
+==============================================
+Ended process
+Page 115 not found
+Recovered pages: 115
+Documents inserted: 27644
 
 ```
 
