@@ -47,5 +47,12 @@
     "require": [
       "babel-register"
     ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zucchinidev/tvmaze-sync"
+  },
+  "bugs": {
+    "url": "https://github.com/zucchinidev/tvmaze-sync/issues"
   }
 }
